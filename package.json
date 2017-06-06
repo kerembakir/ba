@@ -1,0 +1,24 @@
+{
+  "name": "ba",
+  "version": "1.0.0",
+  "description": "Blog App",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kerembakir/ba.git"
+  },
+  "keywords": [
+    "blog",
+    "app",
+    "node"
+  ],
+  "author": "Kerem Bakir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kerembakir/ba/issues"
+  },
+  "homepage": "https://github.com/kerembakir/ba#readme"
+}
