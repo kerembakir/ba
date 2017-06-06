@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/kerembakir/ba/issues"
   },
-  "homepage": "https://github.com/kerembakir/ba#readme"
+  "homepage": "https://github.com/kerembakir/ba#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "express-session": "^1.15.3",
+    "sequelize": "^3.30.4"
+  }
 }
