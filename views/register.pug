@@ -26,6 +26,15 @@ body
       li(role='presentation')
         a(href='/users/') Profile
       li(role='presentation')
+        a(href='/createpost') Create post
+      li(role='presentation')
+        a(href='/posts') See own posts
+      li(role='presentation')
+        a(href='/allposts') See all posts
+      li(role='presentation')
+        a(href='/comments') Leave comment
+
+      li(role='presentation')
         a(href='/logout') Logout
     
     .container
@@ -36,7 +45,7 @@ body
           form(action="create" method='post' class= "form" name= "message")
             .form-group
               label Name:
-              input(type="text" name='name' required placeholder="Kerem Bakir" autocomplete="off" class="form-control")
+              input(type="text" name='name' autofocus required placeholder="Kerem Bakir" autocomplete="off" class="form-control")
             .form-group
               label Email:
               input(type="text" name='email' required placeholder="kerembakir@gmail.com" autocomplete="off" class="form-control")
@@ -56,3 +65,7 @@ body
 
 
     script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
+
+
+
+    //- else toevoegen
