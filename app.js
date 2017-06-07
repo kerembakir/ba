@@ -40,7 +40,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 
-// Sequelize Models
+// Sequelize Models Defining
 var User = sequelize.define('users', {
 	name: {
 		type: Sequelize.TEXT,
@@ -319,5 +319,9 @@ app.get('/allposts', function (request, response) {
   });
 
 
-app.listen(3000);
-console.log('BA-App running on port 3000');
+// var server = app.listen(3000);
+// console.log('BA-App running on port 3000');
+
+var server = app.listen(3000, function () {
+	console.log('BA-App running on port: ' + server.address().port);
+        });
