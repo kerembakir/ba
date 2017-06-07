@@ -1,12 +1,13 @@
 html
   head
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+
 body
   page-header
   h1 BA 
   nav(class="navbar navbar-light bg-faded")
     ul.nav.nav-tabs
-      li.active(role='presentation')
+      li(role='presentation')
         a(href='/') Homepage
       li(role='presentation')
         a(href='/register') Register
@@ -14,7 +15,7 @@ body
         a(href='/login') Login
       li(role='presentation')
         a(href='/users/') Profile
-      li(role='presentation')
+      li.active(role='presentation')
         a(href='/createpost') Create post
       li(role='presentation')
         a(href='/posts') See own posts
@@ -24,6 +25,34 @@ body
         a(href='/comments') Leave comment
       li(role='presentation')
         a(href='/logout') Logout
+
     
-    
+    .container
+      .row
+        .col-xs-6.offset-xs-3
+          h1.text-xl-center Create Post
+          hr
+          form(action="create" method='post' class= "form" name= "message")
+            .form-group
+              label Title:
+              input(type="text" name="title" autofocus placeholder="Type a title" autocomplete="off" class="form-control")
+            .form-group
+              label Message:
+              textarea(type="text" name="message" placeholder="Type a message" autocomplete="off" class="form-control" rows="5")
+            .form-group
+              button(type="submit" class="btn btn-primary btn-lg btn-") Post Message
+          
+
+
+
+
+
+
+
+
+
     script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
+
+
+
+    //- else toevoegen
