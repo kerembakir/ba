@@ -7,30 +7,15 @@ body
   nav(class="navbar navbar-light bg-faded")
     ul.nav.nav-tabs
       li.active(role='presentation')
-        a(href='/') Register
+        a(href='/') Homepage
       li(role='presentation')
-        a(href='/') Login
+        a(href='/register') Register
       li(role='presentation')
-        a(href='/') Create
+        a(href='/login') Login
       li(role='presentation')
-        a(href='/') View
-      
-      
-      
+        a(href='/users/') Profile
       li(role='presentation')
-        a(href='/') Logout
-    .container
-      .row
-        .col-xs-6.offset-xs-3
-          h1.text-xl-center Write Message
-          hr
-          form(action="create" method='post' class= "form" name= "message")
-            .form-group
-              label Title:
-              input(type="text" name='title' placeholder="Type a title" autocomplete="off" class="form-control")
-            .form-group
-              label Body:
-              textarea(type="text" name="body" placeholder="Type a message" autocomplete="off" class="form-control" rows="5")
-            .form-group
-              button(type="submit" class="btn btn-primary btn-lg btn-") Post Message
+        a(href='/logout') Logout
+    
+    
     script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")

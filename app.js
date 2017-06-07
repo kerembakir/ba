@@ -23,7 +23,7 @@ var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, null, {
 
 
 //Pug connect
-app.set('views', '/views');
+app.set('views', './views');
 app.set('view engine', 'pug');
 
 
@@ -36,7 +36,7 @@ app.use(bodyParser.urlencoded({
 
 
 //Vraagt static files op
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '../public'));
 
 
 
@@ -120,9 +120,10 @@ app.use(session({
 
 //Index page
 app.get('/', function (request, response) {
-  response.render('index', {
-    user: request.session.user
-  });
+    response.render('index', {
+        message: request.query.message,
+        user: request.session.user
+    });
 });
 
 

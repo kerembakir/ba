@@ -1,0 +1,19 @@
+doctype html
+html
+	title The best blogApp!
+	head
+	body
+		h2 Welcome #{user.name} :)
+		h3 this is your user id: #{user.id}
+		h3 email: #{user.email}
+
+		br
+		a(href='/createpost') create post
+		br
+		a(href='/posts') see your own posts
+		br
+		a(href='/allposts') see posts of others
+		br
+		a(href='/') home
+		br
+		a(href='/logout') log out
