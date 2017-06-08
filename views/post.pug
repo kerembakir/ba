@@ -1,0 +1,46 @@
+html
+	link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+	head
+		title BA - Post message
+	body
+		nav(class="navbar navbar-light bg-faded")
+			div
+				a(href= "/logout") Logout
+			div
+				a(href= "/") Index
+			div
+				a(href= "/profile") Go to profile
+			div
+				a(href= '/myposts') View your own posts
+			div
+				a(href='/post') View everybody's posts
+		h1 All posts
+		each post in posts
+			each user in users
+				if post.userId===user.id
+					h2 #{user.name} said:
+					h3 #{post.title}
+					p #{post.body}
+					each comment in post.comments
+						each user in users
+							if comment.userId === user.id
+								h4 #{user.name} commented:
+								p #{comment.body}
+					form(action='/comment' method='post')
+						h4 Comment:
+						textarea(name= 'comment' id='comment' placeholder= 'Post comment')
+						input(type='hidden' name='messageId' value=post.id)
+						br
+						br
+						input(type='submit' value='Submit  comment')
+		else
+			h2 Nothing posted yet
+		h2 Post message
+		form(action='/post' method='post')
+			h3 Title:
+			input(name= 'title' id='title' placeholder= 'Type title')
+			h3 Type in your message:
+			textarea(name= 'message' id='textbox' placeholder= 'Type message')
+			br
+			br
+			input(type= 'submit' value= "Submit post")

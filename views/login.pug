@@ -1,57 +1,21 @@
 html
-  head
-    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-body
-  page-header
-  h1 BA 
-  if user
-  nav(class="navbar navbar-light bg-faded")
-    ul.nav.nav-tabs
-      li(role='presentation')
-        a(href='/') Homepage
-      li(role='presentation')
-        a(href='/register') Register
-      li.active(role='presentation')
-        a(href='/login') Login
-      li(role='presentation')
-        a(href='/profile') Profile
-      li(role='presentation')
-        a(href='/createpost') Create post
-      li(role='presentation')
-        a(href='/posts') See own posts
-      li(role='presentation')
-        a(href='/allposts') See all posts
-      li(role='presentation')
-        a(href='/comments') Leave comment
-      li(role='presentation')
-        a(href='/logout') Logout
-    
-    .container
-      .row
-        .col-xs-6.offset-xs-3
-          h1.text-xl-center Login
-          hr
-          form(action="login" method='post' class= "form" name= "message")
-            .form-group
-              label Email:
-              input(type="text" name='email' autofocus required placeholder="kerembakir@gmail.com" autocomplete="off" class="form-control" id="email")
-            .form-group
-              label Password:
-              input(type="password" name='password' required placeholder="blablabla" autocomplete="off" class="form-control" id="password")
-            .form-group
-              button(type="submit" class="btn btn-primary btn-lg btn-") Submit
-          
-
-
-
-
-
-
-
-
-
-    script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
-
-
-
-    //- else toevoegen
+	head
+		link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+		title BA - Login
+	body
+		nav(class="navbar navbar-light bg-faded")
+			div
+				a(href= "/register") Register
+			div
+				a(href= "/") Index
+			div
+				a(href='/profile') Go to your profile!
+		h2 Type in your email and password to login
+		form(action='/login' method='post')
+			h3 Type in your email:
+			input(name= 'email')
+			h3 Type in your password:
+			input(name= 'password' type='password')
+			br
+			br
+			input(type= 'submit' value= "Login")

@@ -1,7 +1,7 @@
 //modules
 var express = require('express');
 var bodyParser = require('body-parser');
-var pg = require('pg');
+var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
@@ -42,9 +42,9 @@ app.use(express.static(__dirname + '../public'));
 
 // Sequelize Models Defining
 var User = sequelize.define('user', {
-  name: Sequelize.STRING,
-  email: Sequelize.STRING,
-  password: Sequelize.STRING
+	name: Sequelize.STRING,
+	email: Sequelize.STRING,
+	password: Sequelize.STRING
 });
 
 
@@ -92,13 +92,6 @@ app.get('/', function (request, response) {
 });
 
 
-// app.get('/', function(request, response) {
-//   var userId = req.session.userId
-
-//   res.render('/', {userId})
-// })
-
-
 
 //Register an account
 app.get('/register', function(request, response){
@@ -108,64 +101,40 @@ app.get('/register', function(request, response){
 
 
 //Store login data in database
-// app.post('/register', bodyParser.urlencoded({extended: true}), function (request, response) {
-//   bcrypt.hash(request.body.password, 10, function (err, hash) {
-//     if(err) {
-//       console.log(err)
-//     }
-//     console.log(hash);
-//     User.create({
-//       name:request.body.name,
-//       email: request.body.email,
-//       password:hash
-//     }).then (function () {
-//       response.redirect('/')
-//     });
-//   });
-// });
-
-app.post('/register', function(request, response){
-  var name = request.body.name
-  var email = request.body.email
-  var password = request.body.password
-  var checkPassword = request.body.checkPassword
-
-  if(password != checkPassword) {
-    response.send("Error: Password doesn't match!")
-  }
-  else {
-    User.create( {
-      name: name,
-      email: email,
-      password: password
-    })
-    .then(function(newUser) {
-      console.log('New User created: ' + newUser.get({
-        plain: true
-      }))
-      response.redirect('login')
-    })
-    .catch(function(error) {
-      console.log('Error!')
-    })
-  }
+app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
+	User.sync()
+		.then(function(){
+			User.findOne({
+				where: {
+					email: request.body.email
+				}
+			})
+			.then(function(user){
+			if(user !== null && request.body.email=== user.email) {
+        		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
+				return;
+			}
+			else {
+				User.sync()
+					.then(function(){
+						return User.create({
+							name: request.body.name,
+							email: request.body.email,
+							password: request.body.password
+						})
+					})
+					.then(function(){
+						response.render('login')
+					})
+					.then().catch(error => console.log(error))
+			}
+		})
+		.then().catch(error => console.log(error))
+		})
+	.then().catch(error => console.log(error))
 })
 
 
-
-
-
-
-
-
-
-//Login page
-app.get('/login', function (request, response) {
-  response.render('login', {
-    Message: request.query.message,
-    User: request.query.user
-  });
-});
 
 app.get('/profile', function (request, response) {
     var user = request.session.user;
@@ -178,37 +147,46 @@ app.get('/profile', function (request, response) {
     }
 });
 
-app.post('/login', bodyParser.urlencoded({extended: true}), function (request, response) {
-    if(request.body.email.length === 0) {
-        response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
-        return;
-    }
 
-    if(request.body.password.length === 0) {
-        response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
-        return;
-    }
 
-    User.findOne({
-        where: {
-            email: request.body.email
-        }
-    }).then(function (user) {
-        if (user !== null && request.body.password === user.password) {
-            request.session.user = user;
-            response.redirect('/profile');
-        } else {
-            response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-        }
-    }, function (error) {
-        response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-    });
+//Login page
+app.get('/login', function (request, response) {
+  response.render('login', {
+    Message: request.query.message,
+    User: request.query.user
+  });
+});
+
+
+app.post('/login', (request, response)=>{
+	if(request.body.email.length ===0) {
+		response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
+		return;
+	}
+	if(request.body.password.length===0) {
+		response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
+		return;
+	}
+	User.findOne({
+		where: {
+			email:request.body.email
+		}
+	}).then((user) => {
+		if(user !== null && request.body.password === user.password) {
+			request.session.user = user;
+			response.redirect('/');
+		} else {
+			response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+		}
+	}, (error)=> {
+		response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+	});
 });
 
 
 
 //Logout
-app.get('/logout', function (request, response) {
+app.get('/logout', (request, response)=> {
     request.session.destroy(function(error) {
         if(error) {
             throw error;
@@ -218,128 +196,167 @@ app.get('/logout', function (request, response) {
 });
 
 
-
-
-//Create Post (load post)
-app.get('/createpost', function (request, response) {
-  response.render('createpost', {
-  });
-});
-
-
-
 //Create Post (store post)
-app.post('/createpost', bodyParser.urlencoded({extended: true}), function (request, response) {
-  User.findOne({
-    where: {
-      id: request.session.user.id
-    }
-  }).then(function (theUser){
-    theUser.createPost({
-      title: request.body.title,
-      body: request.body.message
-    }).then (function () {
-      response.redirect('/posts')
-    });
-  });
+app.get('/post', (request,response) =>{
+	var user = request.session.user;
+	if (user === undefined) {
+		response.redirect('/?message=' + encodeURIComponent("Please log in first"));
+	}
+	Post.sync()
+	.then(function(){
+		User.findAll()
+		.then((users)=>{
+			Post.findAll({include: [{
+				model: Comment,
+				as: 'comments'
+			}]
+		})
+		.then((posts)=>{
+			response.render('post', {
+				posts: posts,
+				users: users
+			})
+		})
+	})
+})
+.then().catch(error=> console.log(error))
 });
 
-
-
-//View a list of their own posts
-app.get('/posts', function (request, response) {
-
-  User.findOne({
-    where: {
-      id: request.session.user.id
-    }
-  }).then(function (theUser){
-    theUser.getPosts({
-      include:[Comment]
-    }).then(function (results) {
-      // response.send(results)
-      response.render('posts', {
-        allOwnPosts:results
-      });
-    });
-  });
-});
-
-
-
-//View a list of everyone's posts
-app.get('/allposts', function (request, response) {
-
-  Post.findAll({
-    include: [
-      {model: User},
-      {model: Comment,
-        include: {model: User}}
-      ]
-    }).then(function (posts) {
-      response.render('allposts', {
-        allPosts: posts
-      });
-      // response.send(posts)
-    });
-  });
-
-Post.findAll(
-    {
-      where: {userId: userId},
-      include: [User,
-        {
-          model: Comment,
-          include: [
-            User
-          ]
-        }
-      ]}
-  )
-  .then(function(posts){
-    res.render("allposts", {posts, userId})
-  })
+app.post('/post', (request,response) => {
+	if(request.body.message.length===0 || request.body.title.length===0) {
+		response.end('Please insert message');
+		return
+	}
+	else {
+		Post.sync()
+			.then()
+				User.findOne({
+					where: {
+						email: request.session.user.email
+					}
+				}).then((user)=>{
+					return Post.create({
+						title: request.body.title,
+						body: request.body.message,
+						userId: user.id
+					})
+				}).then().catch(error=> console.log(error))
+			.then(function() {
+				response.redirect('/post');
+			})
+			.then().catch(error => console.log(error));
+	}
 })
 
 
 
 
+//View a list of their own posts
+app.get('/myposts', (request,response) =>{
+	var user = request.session.user;
+	if (user === undefined) {
+        response.redirect('/?message=' + encodeURIComponent("Log in first!"));
+    }
+	Post.findAll({
+		where: {
+			userId: user.id
+		},
+		include:[{
+			model: Comment,
+			as: 'comments'
+		}]
+	})
+	.then((posts)=>{
+		User.findAll().then((users)=>{
+			response.render('post', {
+				posts: posts,
+				users: users
+			})
+		})
+	})
+	.then().catch(error => console.log(error))
+});
+
+
+
+//View a list of everyone's posts
+// app.get('/allposts', function (request, response) {
+//
+//   Post.findAll({
+//     include: [
+//       {model: User},
+//       {model: Comment,
+//         include: {model: User}}
+//       ]
+//     }).then(function (posts) {
+//       response.render('allposts', {
+//         allPosts: posts
+//       });
+//       // response.send(posts)
+//     });
+//   });
+//
+// Post.findAll(
+//     {
+//       where: {userId: userId},
+//       include: [User,
+//         {
+//           model: Comment,
+//           include: [
+//             User
+//           ]
+//         }
+//       ]}
+//   )
+//   .then(function(posts){
+//     res.render("allposts", {posts, userId})
+//   })
+// })
 
 
 
 
-
-  //Make comments, lists
-  app.post('/comments', bodyParser.urlencoded({extended: true}), function (request, response) {
-    Promise.all([
-      Post.findOne({ where: { id: request.body.id } }),
-      User.findOne({ where: { id: request.session.user.id } })
-    ]).then(function(theData){
-      theData[1].createComment ({ body: request.body.comment }).then(function(theComment){
-        theComment.setPost(theData[0]).then(function(){
-          response.redirect('/allposts')
-        });
-      });
-    });
-  });
+//Make comments
+	app.post('/comment', (request,response)=>{
+		if(request.body.comment.length===0) {
+			response.end('You forgot your comment!')
+		}
+		else {
+			Comment.sync()
+				.then()
+					User.findOne({
+						where: {
+							email: request.session.user.email
+						}
+					}).then(user => {
+						return Comment.create({
+							body: request.body.comment,
+							postId: request.body.messageId,
+							userId: user.id
+						})
+					}).then(function(){
+						response.redirect('/post')
+					}).then().catch(error => console.log(error));
+		}
+	})
 
 
 
 
   //look for specific post
-  app.get('/post/:id', function (request, response) {
-    var postid = request.params.id
-    Post.findAll({
-      where: {
-        id:postid
-      },
-      include: [User, Comment]
-    }).then(function(posts) {
-      response.render('onepost', {
-        posts:posts
-      });
-    });
-  });
+  // app.get('/post/:id', function (request, response) {
+  //   var postid = request.params.id
+  //   Post.findAll({
+  //     where: {
+  //       id:postid
+  //     },
+  //     include: [User, Comment]
+  //   }).then(function(posts) {
+  //     response.render('onepost', {
+  //       posts:posts
+  //     });
+  //   });
+  // });
 
 
 
