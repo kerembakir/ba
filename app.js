@@ -41,28 +41,22 @@ app.use(express.static(__dirname + '../public'));
 
 
 // Sequelize Models Defining
-var User = sequelize.define('users', {
-	name: {
-		type: Sequelize.TEXT,
-		allowNull: false,
-		unique: true
-	},
-	email: {
-		type: Sequelize.TEXT,
-		allowNull: false,
-		unique: true
-	},
-	password: Sequelize.TEXT,
+var User = sequelize.define('user', {
+  name: Sequelize.STRING,
+  email: Sequelize.STRING,
+  password: Sequelize.STRING
 });
 
-var Post = sequelize.define('posts', {
-	title: Sequelize.TEXT,
-	body: Sequelize.TEXT,
+
+
+var Post = sequelize.define('post', {
+	title: Sequelize.STRING,
+	body: Sequelize.STRING,
 	timeStamp: Sequelize.DATE,
 });
 
-var Comment = sequelize.define('comments', {
-	body: Sequelize.TEXT,
+var Comment = sequelize.define('comment', {
+	body: Sequelize.STRING,
 	timeStamp: Sequelize.DATE,
 });
 
@@ -78,40 +72,11 @@ Comment.belongsTo(User);
 
 
 
-//Sync database, create users
-sequelize.sync({force: true}).then( function() {
-  console.log('sync done')
-  User.create({
-    name: 'kerem',
-    email: 'bak@plakzak.io',
-    password: 'bakkiebak'
-  }).then(function(eersteNaam){
-    console.log('bakkie hoi!');
-    eersteNaam.createPost({
-      title: 'Hey bak',
-      body: 'Hallo, ik ben bakkie'
-    })
-  })
-  User.create({
-    name: 'Kir',
-    email: 'kir@kierewiet.nl',
-    password: 'kirkir'
-  }).then(function(tweedeNaam){
-    console.log('Hoi kir');
-    tweedeNaam.createPost({
-      title: 'Hey kir',
-      body: 'Hallo, ik ben kir'
-    })
-  })
-});
-
-
-
 //Activate session
 app.use(session({
-  secret: 'oh wow very secret much security',
-  resave: true,
-  saveUninitialized: false
+    secret: 'oh wow very secret much security',
+    resave: true,
+    saveUninitialized: false
 }));
 
 
@@ -127,6 +92,13 @@ app.get('/', function (request, response) {
 });
 
 
+// app.get('/', function(request, response) {
+//   var userId = req.session.userId
+
+//   res.render('/', {userId})
+// })
+
+
 
 //Register an account
 app.get('/register', function(request, response){
@@ -136,21 +108,54 @@ app.get('/register', function(request, response){
 
 
 //Store login data in database
-app.post('/register', bodyParser.urlencoded({extended: true}), function (request, response) {
-  bcrypt.hash(request.body.password, 10, function (err, hash) {
-    if(err) {
-      console.log(err)
-    }
-    console.log(hash);
-    User.create({
-      name:request.body.name,
-      email: request.body.email,
-      password:hash
-    }).then (function () {
-      response.redirect('/')
-    });
-  });
-});
+// app.post('/register', bodyParser.urlencoded({extended: true}), function (request, response) {
+//   bcrypt.hash(request.body.password, 10, function (err, hash) {
+//     if(err) {
+//       console.log(err)
+//     }
+//     console.log(hash);
+//     User.create({
+//       name:request.body.name,
+//       email: request.body.email,
+//       password:hash
+//     }).then (function () {
+//       response.redirect('/')
+//     });
+//   });
+// });
+
+app.post('/register', function(request, response){
+  var name = request.body.name
+  var email = request.body.email
+  var password = request.body.password
+  var checkPassword = request.body.checkPassword
+
+  if(password != checkPassword) {
+    response.send("Error: Password doesn't match!")
+  }
+  else {
+    User.create( {
+      name: name,
+      email: email,
+      password: password
+    })
+    .then(function(newUser) {
+      console.log('New User created: ' + newUser.get({
+        plain: true
+      }))
+      response.redirect('login')
+    })
+    .catch(function(error) {
+      console.log('Error!')
+    })
+  }
+})
+
+
+
+
+
+
 
 
 
@@ -162,62 +167,56 @@ app.get('/login', function (request, response) {
   });
 });
 
-app.get('/users/:id', function (request, response) {
-  var user = request.session.user;
-  if (user === undefined) {
-    response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
-  } else {
-    response.render('users/profile', {
-      user: user,
-    });
-  };
+app.get('/profile', function (request, response) {
+    var user = request.session.user;
+    if (user === undefined) {
+        response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
+    } else {
+        response.render('profile', {
+            user: user
+        });
+    }
 });
 
 app.post('/login', bodyParser.urlencoded({extended: true}), function (request, response) {
-  if(request.body.email.length === 0) {
-    response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
-    return;
-  }
-
-  if(request.body.password.length === 0) {
-    response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
-    return;
-  }
-
-  User.findOne({
-    where: {
-      email: request.body.email
+    if(request.body.email.length === 0) {
+        response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
+        return;
     }
-  }).then(function (user) {
-    var hash = user.password;
-    console.log(hash)
-    bcrypt.compare (request.body.password, hash, function (err, result) {
-      if (err !== undefined) {
-        response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-      } else {
-        console.log(result)
-        if(user !== null && result === true){
-          request.session.user = user;
-          response.redirect('/');
-        } else {
-          response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+
+    if(request.body.password.length === 0) {
+        response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
+        return;
+    }
+
+    User.findOne({
+        where: {
+            email: request.body.email
         }
-      }
+    }).then(function (user) {
+        if (user !== null && request.body.password === user.password) {
+            request.session.user = user;
+            response.redirect('/profile');
+        } else {
+            response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+        }
+    }, function (error) {
+        response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
     });
-  });
 });
 
 
 
 //Logout
 app.get('/logout', function (request, response) {
-  request.session.destroy(function(error) {
-    if(error) {
-      throw error;
-    }
-    response.redirect('/?message=' + encodeURIComponent("Successfully logged out."));
-  })
+    request.session.destroy(function(error) {
+        if(error) {
+            throw error;
+        }
+        response.redirect('/?message=' + encodeURIComponent("Successfully logged out."));
+    })
 });
+
 
 
 
@@ -285,6 +284,29 @@ app.get('/allposts', function (request, response) {
     });
   });
 
+Post.findAll(
+    {
+      where: {userId: userId},
+      include: [User,
+        {
+          model: Comment,
+          include: [
+            User
+          ]
+        }
+      ]}
+  )
+  .then(function(posts){
+    res.render("allposts", {posts, userId})
+  })
+})
+
+
+
+
+
+
+
 
 
   //Make comments, lists
@@ -320,9 +342,22 @@ app.get('/allposts', function (request, response) {
   });
 
 
+
+
+sequelize.sync({force: true}).then(function () {
+    User.create({
+        name: "stabbins",
+        email: "yes@no",
+        password: "not_password"
+    }).then(function () {
+        var server = app.listen(3000, function () {
+            console.log('Example app listening on port: ' + server.address().port);
+        });
+    });
+}, function (error) {
+    console.log('sync failed: ');
+    console.log(error);
+});
+
 // var server = app.listen(3000);
 // console.log('BA-App running on port 3000');
-
-var server = app.listen(3000, function () {
-	console.log('BA-App running on port: ' + server.address().port);
-        });

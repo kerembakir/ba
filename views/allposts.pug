@@ -1,0 +1,54 @@
+html
+  head
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+
+body
+  page-header
+  h1 BA 
+  nav(class="navbar navbar-light bg-faded")
+    ul.nav.nav-tabs
+      li(role='presentation')
+        a(href='/') Homepage
+      li(role='presentation')
+        a(href='/register') Register
+      li(role='presentation')
+        a(href='/login') Login
+      li(role='presentation')
+        a(href='/profile') Profile
+      li(role='presentation')
+        a(href='/createpost') Create post
+      li(role='presentation')
+        a(href='/posts') See own posts
+      li.active(role='presentation')
+        a(href='/allposts') See all posts
+      li(role='presentation')
+        a(href='/comments') Leave comment
+      li(role='presentation')
+        a(href='/logout') Logout
+  
+    
+    .container
+      .row
+        .col-xs-6.offset-xs-3
+          h1.text-xl-center All Posts
+          hr
+          each post in allPosts
+            Post #{post.user.name} says:
+            h2= #{post.title} 
+            h3= post.body
+          
+          
+
+
+
+
+
+
+
+
+
+    script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
+
+
+
+    //- else toevoegen

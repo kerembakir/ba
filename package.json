@@ -22,9 +22,11 @@
   },
   "homepage": "https://github.com/kerembakir/ba#readme",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
+    "nodeman": "^1.1.2",
     "pg": "^6.2.3",
     "pug": "^2.0.0-rc.2",
     "sequelize": "^3.30.4"

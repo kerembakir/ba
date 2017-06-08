@@ -1,16 +1,6 @@
 html
   head
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-  script.
-      $(document).ready(function () {
-        $('#submit').click(function(event) {
-          if($('#email').val().trim().length === 0 || $('#password').val().trim().length === 0 || $('#name').val().trim().length === 0) {
-            event.preventDefault();
-            $('#error-message').html("Your username or password is empty.");
-          }
-        });
-      });
-
 body
   page-header
   h1 BA 
@@ -24,7 +14,7 @@ body
       li(role='presentation')
         a(href='/login') Login
       li(role='presentation')
-        a(href='/users/') Profile
+        a(href='/profile') Profile
       li(role='presentation')
         a(href='/createpost') Create post
       li(role='presentation')
@@ -42,7 +32,7 @@ body
         .col-xs-6.offset-xs-3
           h1.text-xl-center Register
           hr
-          form(action="create" method='post' class= "form" name= "message")
+          form(action="register" method='post' class= "form" name= "message")
             .form-group
               label Name:
               input(type="text" name='name' autofocus required placeholder="Kerem Bakir" autocomplete="off" class="form-control")
@@ -51,7 +41,10 @@ body
               input(type="text" name='email' required placeholder="kerembakir@gmail.com" autocomplete="off" class="form-control")
             .form-group
               label Password:
-              input(type="text" name='password' required placeholder="blablabla" autocomplete="off" class="form-control")
+              input(type="password" name='password' required placeholder="blablabla" autocomplete="off" class="form-control")
+            .form-group
+              label Re-type password:
+              input(type="password" name='checkPassword' required placeholder="blablabla" autocomplete="off" class="form-control")
             .form-group
               button(type="submit" class="btn btn-primary btn-lg btn-") Submit
           

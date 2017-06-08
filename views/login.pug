@@ -1,16 +1,6 @@
 html
   head
     link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
-  script.
-      $(document).ready(function () {
-        $('#submit').click(function(event) {
-          if($('#email').val().trim().length === 0 || $('#password').val().trim().length === 0 || $('#name').val().trim().length === 0) {
-            event.preventDefault();
-            $('#error-message').html("Your username or password is empty.");
-          }
-        });
-      });
-
 body
   page-header
   h1 BA 
@@ -24,7 +14,7 @@ body
       li.active(role='presentation')
         a(href='/login') Login
       li(role='presentation')
-        a(href='/users/') Profile
+        a(href='/profile') Profile
       li(role='presentation')
         a(href='/createpost') Create post
       li(role='presentation')
@@ -41,13 +31,13 @@ body
         .col-xs-6.offset-xs-3
           h1.text-xl-center Login
           hr
-          form(action="create" method='post' class= "form" name= "message")
+          form(action="login" method='post' class= "form" name= "message")
             .form-group
               label Email:
               input(type="text" name='email' autofocus required placeholder="kerembakir@gmail.com" autocomplete="off" class="form-control" id="email")
             .form-group
               label Password:
-              input(type="text" name='password' required placeholder="blablabla" autocomplete="off" class="form-control" id="password")
+              input(type="password" name='password' required placeholder="blablabla" autocomplete="off" class="form-control" id="password")
             .form-group
               button(type="submit" class="btn btn-primary btn-lg btn-") Submit
           
