@@ -1,22 +1,36 @@
 html
 	head
-		link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
 		title BA - Index
 	body
-		nav(class="navbar navbar-light bg-faded")
-			if user
-				div
-					a(href="/logout") Logout
-			else
-				div
-					a(href= "/login") Login
-				div
-					a(href= "/register") Register
-			div 
-				a(href= "/profile") Go to profile
-		h1 Welcome
 		if user
-			p Hello #{user.name}
+			nav.nav-extended
+				.nav-wrapper
+					a.brand-logo(href='#') Logo
+					a.button-collapse(href='#', data-activates='mobile-demo')
+						i.material-icons menu
+					ul#nav-mobile.right.hide-on-med-and-down
+						li
+							a(href="/logout") Logout
+						li
+							a(href="/profile") Go to profile
 		else
-			p Login or register please
-		p #{message}
+			nav(class="navbar navbar-light bg-faded")
+				ul.nav.nav-tabs
+					li(role='presentation')
+						a(href= "/login") Login
+					li(role='presentation')
+						a(href= "/register") Register
+					li(role='presentation')
+						a(href= "/profile") Go to profile
+	h1 Welcome
+	if user
+		p Hello #{user.name}
+	else
+		p Login or register please
+	p #{message}
+	
+	script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
+	script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
+
+

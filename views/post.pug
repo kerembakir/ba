@@ -1,19 +1,76 @@
 html
-	link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous")
+	link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
 	head
 		title BA - Post message
 	body
-		nav(class="navbar navbar-light bg-faded")
-			div
-				a(href= "/logout") Logout
-			div
-				a(href= "/") Index
-			div
-				a(href= "/profile") Go to profile
-			div
-				a(href= '/myposts') View your own posts
-			div
-				a(href='/post') View everybody's posts
+		nav.nav-extended
+			.nav-wrapper
+				a.brand-logo(href='#') Logo
+				a.button-collapse(href='#', data-activates='mobile-demo')
+					i.material-icons menu
+				ul#nav-mobile.right.hide-on-med-and-down
+					li
+						a(href='sass.html') Sass
+					li
+						a(href='badges.html') Components
+					li
+						a(href='collapsible.html') JavaScript
+				ul#mobile-demo.side-nav
+					li
+						a(href='sass.html') Sass
+					li
+						a(href='badges.html') Components
+					li
+						a(href='collapsible.html') JavaScript
+			.nav-content
+				ul.tabs.tabs-transparent
+					li.tab
+						a(href='#test1') Test 1
+					li.tab
+						a.active(href='#test2') Test 2
+					li.tab.disabled
+						a(href='#test3') Disabled Tab
+					li.tab
+						a(href='#test4') Test 4
+		#test1.col.s12 Test 1
+		#test2.col.s12 Test 2
+		#test3.col.s12 Test 3
+		#test4.col.s12 Test 4
+
+
+		//- nav.nav-extended
+		//- 	.nav-wrapper
+		//- 		a.brand-logo(href='#') Logo
+		//- 		a.button-collapse(href='#', data-activates='mobile-demo')
+		//- 			i.material-icons menu
+		//- 		ul#nav-mobile.right.hide-on-med-and-down
+		//- 			li
+		//- 				a(href='/') Home Index
+		//- 			li
+		//- 				a(href='/profile') Go to profile
+		//- 			li
+		//- 				a(href='/logout') Logout
+		//- 		ul#mobile-demo.side-nav
+		//- 			li
+		//- 				a(href='sass.html') Sass
+		//- 			li
+		//- 				a(href='badges.html') Components
+		//- 			li
+		//- 				a(href='collapsible.html') JavaScript
+		//- 	.nav-content
+		//- 		ul.tabs.tabs-transparent
+		//- 			li.tab
+		//- 				a(href='/myposts') My Posts
+		//- 			li.tab
+		//- 				a.active(href='/post') Post
+		//- 			li.tab
+		//- 				a(href='/posts') Posts
+		//- 			li.tab.disabled
+		//- 				a(href='#') Search Post
+		//- 	#test1.col.s12 Test 1
+		//- 	#test2.col.s12 Test 2
+		//- 	#test3.col.s12 Test 3
+		//- 	#test4.col.s12 Test 4
 		
 		.container
 			.row
@@ -37,7 +94,7 @@ html
 									input(type='hidden' name='messageId' value=post.id)
 									br
 									br
-									button(type='submit' class='btn btn-primary btn-lg btn-') Post Message
+									button(type='submit' class='btn btn-primary btn-lg btn-') Send
 					else
 						h2 Nothing posted yet
 					h2 Post message
@@ -48,4 +105,6 @@ html
 						textarea(name= 'message' id='textbox' placeholder= 'Type message')
 						br
 						br
-						input(type= 'submit' value= "Submit post")
+						input(type= 'submit' value= "Send")
+	script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
+	script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
