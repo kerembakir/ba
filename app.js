@@ -76,7 +76,7 @@ Comment.belongsTo(User);
 app.use(session({
     secret: 'oh wow very secret much security',
     resave: true,
-    saveUninitialized: false
+    saveUninitialized: true
 }));
 
 
