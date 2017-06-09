@@ -1,5 +1,7 @@
 html
 	head
+		link(href='http://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
 		title BA - Index
 	body
@@ -15,22 +17,28 @@ html
 						li
 							a(href="/profile") Go to profile
 		else
-			nav(class="navbar navbar-light bg-faded")
-				ul.nav.nav-tabs
-					li(role='presentation')
-						a(href= "/login") Login
-					li(role='presentation')
-						a(href= "/register") Register
-					li(role='presentation')
-						a(href= "/profile") Go to profile
-	h1 Welcome
-	if user
-		p Hello #{user.name}
-	else
-		p Login or register please
-	p #{message}
-	
-	script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js")
-	script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
-
-
+			nav.nav-extended
+				.nav-wrapper
+					a.brand-logo(href='#') Logo
+					a.button-collapse(href='#', data-activates='mobile-demo')
+						i.material-icons menu
+					ul#nav-mobile.right.hide-on-med-and-down
+						li
+							a(href= "/login") Login
+						li
+							a(href= "/register") Register
+						li
+							a(href= "/profile") Profile
+			
+	.container
+		.row
+			.col.s6.offset-s6
+			h1 Hoi  
+		if user
+			p Hello #{user.name}
+		else
+			p Login or register 
+		p #{message}
+		
+		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
