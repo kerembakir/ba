@@ -7,33 +7,32 @@ html
 	body
 		nav.nav-extended
 			.nav-wrapper
-				a.brand-logo(href='#') Logo
-				a.button-collapse(href='#', data-activates='mobile-demo')
+				a.brand-logo(href='/') Blog App
+				a.button-collapse(href='/', data-activates='mobile-demo')
 					i.material-icons menu
 				ul#nav-mobile.right.hide-on-med-and-down
-					li
-						a(href='/') Index
 					li
 						a(href='/profile') Profile
 					li
 						a(href='/logout') Logout
 				ul#mobile-demo.side-nav
 					li
-						a(href='sass.html') Sass
+						a(href='profile') Profile
 					li
-						a(href='badges.html') Components
-					li
-						a(href='collapsible.html') JavaScript
+						a(href='logout') Logout
+
 			.nav-content
 				ul.tabs.tabs-transparent
 					li.tab
-						a(href='/myposts') My Posts
+						a(target='_blank' href='/profile') Profile
 					li.tab
-						a.active(href='/post') Post
+						a.active(target='_blank' href='/post') Post Message
 					li.tab
-						a(href='/posts') Posts
+						a(target='_blank' href='/myposts') My Messages
+					li.tab
+						a(target='_blank' href='/posts') All Messages
 					li.tab.disabled
-						a(href='#') Search Post
+						a(href='#test4') Search post
 		.container
 			.row
 				.col-xs-6.offset-xs-3

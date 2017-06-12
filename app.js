@@ -1,10 +1,13 @@
 //modules
 var express = require('express');
+var bcrypt = require('bcrypt');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
+
 
 var app = express();
 
