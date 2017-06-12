@@ -5,15 +5,28 @@ html
 		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
 		title BA - My Profile
 	body
-		nav(class="navbar navbar-light bg-faded")
-			div
-				a(href="/logout") Log Out
-			div
-				a(href="/") Index
-		h1 Welcome to your profile #{user.name}
-		h2
-			a(href='/post') View all posts
-		h2
-			a(href='/myposts') View all your own posts
+		nav.nav-extended
+			.nav-wrapper
+				ul#nav-mobile.right
+					li
+						a(href='/') Home
+					li
+						a(href='/profile') Profile
+					li
+						a(href='/logout') Logout
+			.nav-content
+				ul.tabs.tabs-transparent
+					li
+						a(href='/post') Post Message
+					li.tab
+						a(href='/myposts') My Posts
+					li.tab
+						a(href='/posts') All Posts
+					li.tab.disabled
+						a(href='#') Search Post
+		h1 Welcome #{user.name} 
+		
 		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
+		script
+			include custom.js
