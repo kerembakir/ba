@@ -6,7 +6,7 @@ html
 		title BA - My Profile
 	body
 		nav.nav-extended
-				.nav-wrapper
+				.nav-wrapper.light-blue.darken-4
 					a.brand-logo(href='/') Blog App
 					a.button-collapse(href='/', data-activates='mobile-demo')
 						i.material-icons menu
@@ -17,20 +17,25 @@ html
 					ul#mobile-demo.side-nav
 						li
 							a(href='/logout') Logout
-				.nav-content
+				.nav-content.light-blue.darken-4
 					ul.tabs.tabs-transparent
 						li.tab
-							a.active(target='_blank' href='/profile') Profile
+							a.active(target='_self' href='/profile') Profile
 						li.tab
-							a(target='_blank' href='/post') Post Message
+							a(target='_self' href='/post') Post Message
 						li.tab
-							a(target='_blank' href='/myposts') My Messages
+							a(target='_self' href='/myposts') My Messages
 						li.tab
-							a(target='_blank' href='/posts') All Messages
+							a(target='_self' href='/posts') All Messages
 						li.tab.disabled
 							a(href='#test4') Search post
 		
-		h3 Welcome #{user.name} 
+		.container
+			.row
+				.col-xs-6.offset-xs-3
+					h1.text-xl-center Welcome #{user.name} 
+					hr
+					
 		
 		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')

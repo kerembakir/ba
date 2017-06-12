@@ -6,7 +6,7 @@ html
 		title BA - Post message
 	body
 		nav.nav-extended
-			.nav-wrapper
+			.nav-wrapper.light-blue.darken-4
 				a.brand-logo(href='/') Blog App
 				a.button-collapse(href='/', data-activates='mobile-demo')
 					i.material-icons menu
@@ -21,16 +21,16 @@ html
 					li
 						a(href='logout') Logout
 
-			.nav-content
+			.nav-content.light-blue.darken-4
 				ul.tabs.tabs-transparent
 					li.tab
-						a(target='_blank' href='/profile') Profile
+						a(target='_self' href='/profile') Profile
 					li.tab
-						a.active(target='_blank' href='/post') Post Message
+						a.active(target='_self' href='/post') Post Message
 					li.tab
-						a(target='_blank' href='/myposts') My Messages
+						a(target='_self' href='/myposts') My Messages
 					li.tab
-						a(target='_blank' href='/posts') All Messages
+						a(target='_self' href='/posts') All Messages
 					li.tab.disabled
 						a(href='#test4') Search post
 		.container
