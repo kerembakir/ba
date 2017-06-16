@@ -2,7 +2,6 @@
 var express = require('express');
 var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
-// var fs = require('fs');
 var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
@@ -47,7 +46,7 @@ app.use(express.static(__dirname + '../public'));
 var User = sequelize.define('user', {
 	name: Sequelize.STRING,
 	email: Sequelize.STRING,
-	password: Sequelize.STRING // replace with hash?
+	password: Sequelize.STRING
 });
 
 
@@ -104,7 +103,7 @@ app.get('/register', function(request, response){
 
 
 //Store login data in database
-app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
+app.post('/register', bodyParser.urlencoded({extended:false}), (request,response) => {
 	User.sync()
 		.then(function(){
 			User.findOne({
@@ -118,26 +117,25 @@ app.post('/register', bodyParser.urlencoded({extended:true}), (request,response)
 				return;
 			}
 
-//hieronder bcrypt.hash(req.body.password, null, null, (err, hash)=>{
-
 			else {
-				User.sync()
-					.then(function(){
-						return User.create({
-							name: request.body.name,
-							email: request.body.email,
-							password: request.body.password //replace with hash?
+				bcrypt.hash(request.body.password, null, null, (err, hash)=>{
+					if (err) {
+						throw err;
+					}
+					User.sync()
+					.then(()=>{
+						User.create({
+							name: request.body.firstname,
+							email: request.body.lastname,
+							password: hash
 						})
 					})
-					.then(function(){
-						response.render('login')
-					})
-					.then().catch(error => console.log(error))
-			}
+					.then().catch(error=> console.log(error))
+				})
+			}})
+			.then().catch(error => console.log(error))
 		})
 		.then().catch(error => console.log(error))
-		})
-	.then().catch(error => console.log(error))
 })
 
 
@@ -178,12 +176,19 @@ app.post('/login', (request, response)=>{
 			email:request.body.email
 		}
 	}).then((user) => {
-		if(user !== null && request.body.password === user.password) {
-			request.session.user = user;
-			response.redirect('/');
-		} else {
-			response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-		}
+		bcrypt.compare(request.body.password, user.password, (err, data)=>{
+			if (err) {
+				throw err;
+			} else {
+				console.log(data);
+				if(user !== null && request.body.password === user.password) {
+					request.session.user = user;
+					response.redirect('/');
+				} else {
+					response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+				}
+			}
+		});
 	}, (error)=> {
 		response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
 	});
