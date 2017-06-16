@@ -1,8 +1,8 @@
 //modules
 var express = require('express');
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
-var fs = require('fs');
+// var fs = require('fs');
 var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
@@ -15,7 +15,7 @@ var app = express();
 
 //Sequelize connect
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, null, {
+var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
 	host: 'localhost',
 	dialect: 'postgres',
 	define: {
@@ -47,7 +47,7 @@ app.use(express.static(__dirname + '../public'));
 var User = sequelize.define('user', {
 	name: Sequelize.STRING,
 	email: Sequelize.STRING,
-	password: Sequelize.STRING
+	password: Sequelize.STRING // replace with hash?
 });
 
 
@@ -117,13 +117,16 @@ app.post('/register', bodyParser.urlencoded({extended:true}), (request,response)
         		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
 				return;
 			}
+
+//hieronder bcrypt.hash(req.body.password, null, null, (err, hash)=>{
+
 			else {
 				User.sync()
 					.then(function(){
 						return User.create({
 							name: request.body.name,
 							email: request.body.email,
-							password: request.body.password
+							password: request.body.password //replace with hash?
 						})
 					})
 					.then(function(){
@@ -363,26 +366,26 @@ app.get('/myposts', (request,response) =>{
 
 //bcrypt
 
-var password = process.argv[2]; // get their password from the user registration form
-bcrypt.hash(password, 8, function(err, hash) {
-  if (err !== undefined) {
-    console.log(err);
-  } else {
-    sequelize.writeFile("file.txt", hash); // store it in the database
-  }
-});
+// var password = process.argv[2]; // get their password from the user registration form
+// bcrypt.hash(password, 8, function(err, hash) {
+//   if (err !== undefined) {
+//     console.log(err);
+//   } else {
+//     sequelize.writeFile("file.txt", hash); // store it in the database
+//   }
+// });
 
 
-var password = process.argv[2]; // get their password from the user login form
-fs.readFile('file.txt', function(err, data) { // equivalent to getting the user from the database
-  bcrypt.compare(password, data.toString(), function(err, result) {
-    if (err !== undefined) {
-      console.log(err);
-    } else {
-      console.log(result);
-    }
-  });
-});
+// var password = process.argv[2]; // get their password from the user login form
+// fs.readFile('file.txt', function(err, data) { // equivalent to getting the user from the database
+//   bcrypt.compare(password, data.toString(), function(err, result) {
+//     if (err !== undefined) {
+//       console.log(err);
+//     } else {
+//       console.log(result);
+//     }
+//   });
+// });
 
 
 
