@@ -2,7 +2,6 @@
 var express = require('express');
 var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
-var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
@@ -18,7 +17,7 @@ var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, process.env.
 	host: 'localhost',
 	dialect: 'postgres',
 	define: {
-		timestamps: false
+	timestamps: false
 	}
 });
 
@@ -125,8 +124,8 @@ app.post('/register', bodyParser.urlencoded({extended:false}), (request,response
 					User.sync()
 					.then(()=>{
 						User.create({
-							name: request.body.firstname,
-							email: request.body.lastname,
+							name: request.body.name,
+							email: request.body.email,
 							password: hash
 						})
 					})
@@ -136,6 +135,8 @@ app.post('/register', bodyParser.urlencoded({extended:false}), (request,response
 			.then().catch(error => console.log(error))
 		})
 		.then().catch(error => console.log(error))
+
+    response.send("hoooooi")
 })
 
 
@@ -290,42 +291,6 @@ app.get('/myposts', (request,response) =>{
 
 
 
-//View a list of everyone's posts
-// app.get('/allposts', function (request, response) {
-//
-//   Post.findAll({
-//     include: [
-//       {model: User},
-//       {model: Comment,
-//         include: {model: User}}
-//       ]
-//     }).then(function (posts) {
-//       response.render('allposts', {
-//         allPosts: posts
-//       });
-//       // response.send(posts)
-//     });
-//   });
-//
-// Post.findAll(
-//     {
-//       where: {userId: userId},
-//       include: [User,
-//         {
-//           model: Comment,
-//           include: [
-//             User
-//           ]
-//         }
-//       ]}
-//   )
-//   .then(function(posts){
-//     res.render("allposts", {posts, userId})
-//   })
-// })
-
-
-
 
 //Make comments
 	app.post('/comment', (request,response)=>{
@@ -353,50 +318,6 @@ app.get('/myposts', (request,response) =>{
 
 
 
-
-  //look for specific post
-  // app.get('/post/:id', function (request, response) {
-  //   var postid = request.params.id
-  //   Post.findAll({
-  //     where: {
-  //       id:postid
-  //     },
-  //     include: [User, Comment]
-  //   }).then(function(posts) {
-  //     response.render('onepost', {
-  //       posts:posts
-  //     });
-  //   });
-  // });
-
-//bcrypt
-
-// var password = process.argv[2]; // get their password from the user registration form
-// bcrypt.hash(password, 8, function(err, hash) {
-//   if (err !== undefined) {
-//     console.log(err);
-//   } else {
-//     sequelize.writeFile("file.txt", hash); // store it in the database
-//   }
-// });
-
-
-// var password = process.argv[2]; // get their password from the user login form
-// fs.readFile('file.txt', function(err, data) { // equivalent to getting the user from the database
-//   bcrypt.compare(password, data.toString(), function(err, result) {
-//     if (err !== undefined) {
-//       console.log(err);
-//     } else {
-//       console.log(result);
-//     }
-//   });
-// });
-
-
-
-
-
-
 sequelize.sync({force: true}).then(function () {
     User.create({
         name: "stabbins",
@@ -412,5 +333,3 @@ sequelize.sync({force: true}).then(function () {
     console.log(error);
 });
 
-// var server = app.listen(3000);
-// console.log('BA-App running on port 3000');
