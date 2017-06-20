@@ -1,11 +1,10 @@
 //modules
 var express = require('express');
-var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
+var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
-
 
 var app = express();
 
@@ -13,11 +12,11 @@ var app = express();
 
 //Sequelize connect
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
+var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, null, {
 	host: 'localhost',
 	dialect: 'postgres',
 	define: {
-	timestamps: false
+		timestamps: false
 	}
 });
 
@@ -102,7 +101,7 @@ app.get('/register', function(request, response){
 
 
 //Store login data in database
-app.post('/register', bodyParser.urlencoded({extended:false}), (request,response) => {
+app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
 	User.sync()
 		.then(function(){
 			User.findOne({
@@ -115,28 +114,24 @@ app.post('/register', bodyParser.urlencoded({extended:false}), (request,response
         		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
 				return;
 			}
-
 			else {
-				bcrypt.hash(request.body.password, null, null, (err, hash)=>{
-					if (err) {
-						throw err;
-					}
-					User.sync()
-					.then(()=>{
-						User.create({
+				User.sync()
+					.then(function(){
+						return User.create({
 							name: request.body.name,
 							email: request.body.email,
-							password: hash
+							password: request.body.password
 						})
 					})
-					.then().catch(error=> console.log(error))
-				})
-			}})
-			.then().catch(error => console.log(error))
+					.then(function(){
+						response.render('login')
+					})
+					.then().catch(error => console.log(error))
+			}
 		})
 		.then().catch(error => console.log(error))
-
-    response.send("hoooooi")
+		})
+	.then().catch(error => console.log(error))
 })
 
 
@@ -177,19 +172,12 @@ app.post('/login', (request, response)=>{
 			email:request.body.email
 		}
 	}).then((user) => {
-		bcrypt.compare(request.body.password, user.password, (err, data)=>{
-			if (err) {
-				throw err;
-			} else {
-				console.log(data);
-				if(user !== null && request.body.password === user.password) {
-					request.session.user = user;
-					response.redirect('/');
-				} else {
-					response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-				}
-			}
-		});
+		if(user !== null && request.body.password === user.password) {
+			request.session.user = user;
+			response.redirect('/');
+		} else {
+			response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+		}
 	}, (error)=> {
 		response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
 	});
@@ -291,6 +279,42 @@ app.get('/myposts', (request,response) =>{
 
 
 
+//View a list of everyone's posts
+// app.get('/allposts', function (request, response) {
+//
+//   Post.findAll({
+//     include: [
+//       {model: User},
+//       {model: Comment,
+//         include: {model: User}}
+//       ]
+//     }).then(function (posts) {
+//       response.render('allposts', {
+//         allPosts: posts
+//       });
+//       // response.send(posts)
+//     });
+//   });
+//
+// Post.findAll(
+//     {
+//       where: {userId: userId},
+//       include: [User,
+//         {
+//           model: Comment,
+//           include: [
+//             User
+//           ]
+//         }
+//       ]}
+//   )
+//   .then(function(posts){
+//     res.render("allposts", {posts, userId})
+//   })
+// })
+
+
+
 
 //Make comments
 	app.post('/comment', (request,response)=>{
@@ -318,6 +342,25 @@ app.get('/myposts', (request,response) =>{
 
 
 
+
+  //look for specific post
+  // app.get('/post/:id', function (request, response) {
+  //   var postid = request.params.id
+  //   Post.findAll({
+  //     where: {
+  //       id:postid
+  //     },
+  //     include: [User, Comment]
+  //   }).then(function(posts) {
+  //     response.render('onepost', {
+  //       posts:posts
+  //     });
+  //   });
+  // });
+
+
+
+
 sequelize.sync({force: true}).then(function () {
     User.create({
         name: "stabbins",
@@ -333,3 +376,5 @@ sequelize.sync({force: true}).then(function () {
     console.log(error);
 });
 
+// var server = app.listen(3000);
+// console.log('BA-App running on port 3000');
