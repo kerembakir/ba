@@ -3,7 +3,6 @@ html
 		link(href='http://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
-		link(rel='stylesheet', href='public/css/custom.css')
 		title BA - Register 
 	body
 		nav.nav-extended
@@ -19,23 +18,27 @@ html
 						li
 							a(href= "/profile") Profile
 				
-		
-		.container
-			.row
-				.col-xs-6.offset-xs-3
-					h3 Register
-					form.col.s12(action='/register' method='post')
-						h4 Name:
-						input(name='name')
-						h4 Email:
-						input(name='email')
-						p(id='usedemail')
-						h4 Password:
-						input(name='password' type='password')
-						br
-						br
+	.container
+		.row
+			.col.s6.offset-s6
+			h3 Register
+			form.col.s12(action='/register' method='post')
+				.row
+					.input-field.col.s6
+						input#name.validate(placeholder='Kerem', type='text')
+						label(for='name') Name
+				.row
+					.input-field.col.s6
+						input#email.validate(type='email')
+						label(for='email') Email
+				.row
+					.input-field.col.s6
+						input#password.validate(type='password')
+						label(for='password') Password			
+				.row
+					.input-field.col.s6
 						input(type='submit' value= "Submit")
+
+
 		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
-		script	
-			include custom.js

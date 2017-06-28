@@ -1,7 +1,7 @@
 //modules
 var express = require('express');
 var bodyParser = require('body-parser');
-var pg = require('pg');
+var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
@@ -41,28 +41,22 @@ app.use(express.static(__dirname + '../public'));
 
 
 // Sequelize Models Defining
-var User = sequelize.define('users', {
-	name: {
-		type: Sequelize.TEXT,
-		allowNull: false,
-		unique: true
-	},
-	email: {
-		type: Sequelize.TEXT,
-		allowNull: false,
-		unique: true
-	},
-	password: Sequelize.TEXT,
+var User = sequelize.define('user', {
+	name: Sequelize.STRING,
+	email: Sequelize.STRING,
+	password: Sequelize.STRING
 });
 
-var Post = sequelize.define('posts', {
-	title: Sequelize.TEXT,
-	body: Sequelize.TEXT,
+
+
+var Post = sequelize.define('post', {
+	title: Sequelize.STRING,
+	body: Sequelize.STRING,
 	timeStamp: Sequelize.DATE,
 });
 
-var Comment = sequelize.define('comments', {
-	body: Sequelize.TEXT,
+var Comment = sequelize.define('comment', {
+	body: Sequelize.STRING,
 	timeStamp: Sequelize.DATE,
 });
 
@@ -78,40 +72,11 @@ Comment.belongsTo(User);
 
 
 
-//Sync database, create users
-sequelize.sync({force: true}).then( function() {
-  console.log('sync done')
-  User.create({
-    name: 'kerem',
-    email: 'bak@plakzak.io',
-    password: 'bakkiebak'
-  }).then(function(eersteNaam){
-    console.log('bakkie hoi!');
-    eersteNaam.createPost({
-      title: 'Hey bak',
-      body: 'Hallo, ik ben bakkie'
-    })
-  })
-  User.create({
-    name: 'Kir',
-    email: 'kir@kierewiet.nl',
-    password: 'kirkir'
-  }).then(function(tweedeNaam){
-    console.log('Hoi kir');
-    tweedeNaam.createPost({
-      title: 'Hey kir',
-      body: 'Hallo, ik ben kir'
-    })
-  })
-});
-
-
-
 //Activate session
 app.use(session({
-  secret: 'oh wow very secret much security',
-  resave: true,
-  saveUninitialized: false
+    secret: 'oh wow very secret much security',
+    resave: true,
+    saveUninitialized: true
 }));
 
 
@@ -136,20 +101,50 @@ app.get('/register', function(request, response){
 
 
 //Store login data in database
-app.post('/register', bodyParser.urlencoded({extended: true}), function (request, response) {
-  bcrypt.hash(request.body.password, 10, function (err, hash) {
-    if(err) {
-      console.log(err)
+app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
+	User.sync()
+		.then(function(){
+			User.findOne({
+				where: {
+					email: request.body.email
+				}
+			})
+			.then(function(user){
+			if(user !== null && request.body.email=== user.email) {
+        		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
+				return;
+			}
+			else {
+				User.sync()
+					.then(function(){
+						return User.create({
+							name: request.body.name,
+							email: request.body.email,
+							password: request.body.password
+						})
+					})
+					.then(function(){
+						response.render('login')
+					})
+					.then().catch(error => console.log(error))
+			}
+		})
+		.then().catch(error => console.log(error))
+		})
+	.then().catch(error => console.log(error))
+})
+
+
+
+app.get('/profile', function (request, response) {
+    var user = request.session.user;
+    if (user === undefined) {
+        response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
+    } else {
+        response.render('profile', {
+            user: user
+        });
     }
-    console.log(hash);
-    User.create({
-      name:request.body.name,
-      email: request.body.email,
-      password:hash
-    }).then (function () {
-      response.redirect('/')
-    });
-  });
 });
 
 
@@ -162,167 +157,224 @@ app.get('/login', function (request, response) {
   });
 });
 
-app.get('/users/:id', function (request, response) {
-  var user = request.session.user;
-  if (user === undefined) {
-    response.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."));
-  } else {
-    response.render('users/profile', {
-      user: user,
-    });
-  };
-});
 
-app.post('/login', bodyParser.urlencoded({extended: true}), function (request, response) {
-  if(request.body.email.length === 0) {
-    response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
-    return;
-  }
-
-  if(request.body.password.length === 0) {
-    response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
-    return;
-  }
-
-  User.findOne({
-    where: {
-      email: request.body.email
-    }
-  }).then(function (user) {
-    var hash = user.password;
-    console.log(hash)
-    bcrypt.compare (request.body.password, hash, function (err, result) {
-      if (err !== undefined) {
-        response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-      } else {
-        console.log(result)
-        if(user !== null && result === true){
-          request.session.user = user;
-          response.redirect('/');
-        } else {
-          response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-        }
-      }
-    });
-  });
+app.post('/login', (request, response)=>{
+	if(request.body.email.length ===0) {
+		response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
+		return;
+	}
+	if(request.body.password.length===0) {
+		response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
+		return;
+	}
+	User.findOne({
+		where: {
+			email:request.body.email
+		}
+	}).then((user) => {
+		if(user !== null && request.body.password === user.password) {
+			request.session.user = user;
+			response.redirect('/');
+		} else {
+			response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+		}
+	}, (error)=> {
+		response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+	});
 });
 
 
 
 //Logout
-app.get('/logout', function (request, response) {
-  request.session.destroy(function(error) {
-    if(error) {
-      throw error;
-    }
-    response.redirect('/?message=' + encodeURIComponent("Successfully logged out."));
-  })
+app.get('/logout', (request, response)=> {
+    request.session.destroy(function(error) {
+        if(error) {
+            throw error;
+        }
+        response.redirect('/?message=' + encodeURIComponent("Successfully logged out."));
+    })
 });
-
-
-
-//Create Post (load post)
-app.get('/createpost', function (request, response) {
-  response.render('createpost', {
-  });
-});
-
 
 
 //Create Post (store post)
-app.post('/createpost', bodyParser.urlencoded({extended: true}), function (request, response) {
-  User.findOne({
-    where: {
-      id: request.session.user.id
-    }
-  }).then(function (theUser){
-    theUser.createPost({
-      title: request.body.title,
-      body: request.body.message
-    }).then (function () {
-      response.redirect('/posts')
-    });
-  });
+app.get('/post', (request,response) =>{
+	var user = request.session.user;
+	if (user === undefined) {
+		response.redirect('/?message=' + encodeURIComponent("Please log in first"));
+	}
+	Post.sync()
+	.then(function(){
+		User.findAll()
+		.then((users)=>{
+			Post.findAll({include: [{
+				model: Comment,
+				as: 'comments'
+			}]
+		})
+		.then((posts)=>{
+			response.render('post', {
+				posts: posts,
+				users: users
+			})
+		})
+	})
+})
+.then().catch(error=> console.log(error))
 });
+
+app.post('/post', (request,response) => {
+	if(request.body.message.length===0 || request.body.title.length===0) {
+		response.end('Please insert message');
+		return
+	}
+	else {
+		Post.sync()
+			.then()
+				User.findOne({
+					where: {
+						email: request.session.user.email
+					}
+				}).then((user)=>{
+					return Post.create({
+						title: request.body.title,
+						body: request.body.message,
+						userId: user.id
+					})
+				}).then().catch(error=> console.log(error))
+			.then(function() {
+				response.redirect('/post');
+			})
+			.then().catch(error => console.log(error));
+	}
+})
+
 
 
 
 //View a list of their own posts
-app.get('/posts', function (request, response) {
-
-  User.findOne({
-    where: {
-      id: request.session.user.id
+app.get('/myposts', (request,response) =>{
+	var user = request.session.user;
+	if (user === undefined) {
+        response.redirect('/?message=' + encodeURIComponent("Log in first!"));
     }
-  }).then(function (theUser){
-    theUser.getPosts({
-      include:[Comment]
-    }).then(function (results) {
-      // response.send(results)
-      response.render('posts', {
-        allOwnPosts:results
-      });
-    });
-  });
+	Post.findAll({
+		where: {
+			userId: user.id
+		},
+		include:[{
+			model: Comment,
+			as: 'comments'
+		}]
+	})
+	.then((posts)=>{
+		User.findAll().then((users)=>{
+			response.render('post', {
+				posts: posts,
+				users: users
+			})
+		})
+	})
+	.then().catch(error => console.log(error))
 });
 
 
 
 //View a list of everyone's posts
-app.get('/allposts', function (request, response) {
+// app.get('/allposts', function (request, response) {
+//
+//   Post.findAll({
+//     include: [
+//       {model: User},
+//       {model: Comment,
+//         include: {model: User}}
+//       ]
+//     }).then(function (posts) {
+//       response.render('allposts', {
+//         allPosts: posts
+//       });
+//       // response.send(posts)
+//     });
+//   });
+//
+// Post.findAll(
+//     {
+//       where: {userId: userId},
+//       include: [User,
+//         {
+//           model: Comment,
+//           include: [
+//             User
+//           ]
+//         }
+//       ]}
+//   )
+//   .then(function(posts){
+//     res.render("allposts", {posts, userId})
+//   })
+// })
 
-  Post.findAll({
-    include: [
-      {model: User},
-      {model: Comment,
-        include: {model: User}}
-      ]
-    }).then(function (posts) {
-      response.render('allposts', {
-        allPosts: posts
-      });
-      // response.send(posts)
-    });
-  });
 
 
 
-  //Make comments, lists
-  app.post('/comments', bodyParser.urlencoded({extended: true}), function (request, response) {
-    Promise.all([
-      Post.findOne({ where: { id: request.body.id } }),
-      User.findOne({ where: { id: request.session.user.id } })
-    ]).then(function(theData){
-      theData[1].createComment ({ body: request.body.comment }).then(function(theComment){
-        theComment.setPost(theData[0]).then(function(){
-          response.redirect('/allposts')
-        });
-      });
-    });
-  });
+//Make comments
+	app.post('/comment', (request,response)=>{
+		if(request.body.comment.length===0) {
+			response.end('You forgot your comment!')
+		}
+		else {
+			Comment.sync()
+				.then()
+					User.findOne({
+						where: {
+							email: request.session.user.email
+						}
+					}).then(user => {
+						return Comment.create({
+							body: request.body.comment,
+							postId: request.body.messageId,
+							userId: user.id
+						})
+					}).then(function(){
+						response.redirect('/post')
+					}).then().catch(error => console.log(error));
+		}
+	})
 
 
 
 
   //look for specific post
-  app.get('/post/:id', function (request, response) {
-    var postid = request.params.id
-    Post.findAll({
-      where: {
-        id:postid
-      },
-      include: [User, Comment]
-    }).then(function(posts) {
-      response.render('onepost', {
-        posts:posts
-      });
-    });
-  });
+  // app.get('/post/:id', function (request, response) {
+  //   var postid = request.params.id
+  //   Post.findAll({
+  //     where: {
+  //       id:postid
+  //     },
+  //     include: [User, Comment]
+  //   }).then(function(posts) {
+  //     response.render('onepost', {
+  //       posts:posts
+  //     });
+  //   });
+  // });
 
+
+
+
+sequelize.sync({force: true}).then(function () {
+    User.create({
+        name: "stabbins",
+        email: "yes@no",
+        password: "not_password"
+    }).then(function () {
+        var server = app.listen(3000, function () {
+            console.log('Example app listening on port: ' + server.address().port);
+        });
+    });
+}, function (error) {
+    console.log('sync failed: ');
+    console.log(error);
+});
 
 // var server = app.listen(3000);
 // console.log('BA-App running on port 3000');
-
-var server = app.listen(3000, function () {
-	console.log('BA-App running on port: ' + server.address().port);
-        });

@@ -1,0 +1,32 @@
+html
+	head
+		link(href='http://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
+		title BA - My Profile
+	body
+		nav.nav-extended
+			.nav-wrapper
+				ul#nav-mobile.right
+					li
+						a(href='/') Home
+					li
+						a(href='/profile') Profile
+					li
+						a(href='/logout') Logout
+			.nav-content
+				ul.tabs.tabs-transparent
+					li
+						a(href='/post') Post Message
+					li.tab
+						a(href='/myposts') My Posts
+					li.tab
+						a(href='/posts') All Posts
+					li.tab.disabled
+						a(href='#') Search Post
+		h1 Welcome #{user.name} 
+		
+		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
+		script
+			include custom.js
