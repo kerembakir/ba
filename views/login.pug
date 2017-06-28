@@ -5,21 +5,36 @@ html
 		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
 		title BA - Login
 	body
-		nav(class="navbar navbar-light bg-faded")
-			div
-				a(href= "/register") Register
-			div
-				a(href= "/") Index
-			div
-				a(href='/profile') Go to your profile!
-		h2 Type in your email and password to login
-		form(action='/login' method='post')
-			h3 Type in your email:
-			input(name= 'email')
-			h3 Type in your password:
-			input(name= 'password' type='password')
-			br
-			br
-			input(type= 'submit' value= "Login")
+		nav.nav-extended
+				.nav-wrapper.light-blue.darken-3
+					a.brand-logo(href='/') Blog App
+					a.button-collapse(href='/', data-activates='mobile-demo')
+						i.material-icons menu
+					ul#nav-mobile.right.hide-on-med-and-down
+						li
+							a(href= "/register") Register
+						li
+							a(href= "/profile") Profile
+				
+					ul#mobile-demo.side-nav
+						li
+							a(href='/register') Register
+						li
+							a(href='/profile') Profile
+
+		.container
+			.row
+				.col-xs-6.offset-xs-3
+					h4 Login
+					form.col.s12(action='/login' method='post')
+						h4 Email:
+						input(name= 'email')
+						h4 Password:
+						input(name= 'password' type='password')
+						br
+						br
+						input(type= 'submit' value= "Login")
 		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
+		script
+			include custom.js

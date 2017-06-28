@@ -1,0 +1,71 @@
+html
+	head
+		link(href='http://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
+		title BA - Post message
+	body
+		nav.nav-extended
+			.nav-wrapper
+				a.brand-logo(href='/') Blog App
+				a.button-collapse(href='/', data-activates='mobile-demo')
+					i.material-icons menu
+				ul#nav-mobile.right.hide-on-med-and-down
+					li
+						a(href='/profile') Profile
+					li
+						a(href='/logout') Logout
+				ul#mobile-demo.side-nav
+					li
+						a(href='profile') Profile
+					li
+						a(href='logout') Logout
+
+			.nav-content
+				ul.tabs.tabs-transparent
+					li.tab
+						a(target='_self' href='/profile') Profile
+					li.tab
+						a(target='_self' href='/post') Post Message
+					li.tab
+						a(target='_self' href='/myposts') My Messages
+		
+		.container
+			.row
+				.col-xs-6.offset-xs-3
+					h1.text-xl-center All posts
+					hr
+					each post in posts
+						each user in users
+							if post.userId===user.id
+								h1 #{user.name} said:
+								h4 #{post.title}
+								p #{post.body}
+								each comment in post.comments
+									each user in users
+										if comment.userId === user.id
+											h4 #{user.name}:
+											p #{comment.body}
+								form(action='/comment' method='post')
+									h4 Comment:
+									textarea(name='comment' id='comment' placeholder='Post comment' class='form-control' rows='5')
+									input(type='hidden' name='messageId' value=post.id)
+									br
+									br
+									button(type='submit' class='btn btn-primary btn-lg btn-') Send
+					else
+						h2 Nothing posted yet
+					h2 Post message
+					form(action='/post' method='post')
+						h3 Title:
+						input(name= 'title' id='title' placeholder= 'Type title')
+						h3 Type in your message:
+						textarea(name= 'message' id='textbox' placeholder= 'Type message')
+						br
+						br
+						input(type= 'submit' value= "Send")
+
+
+		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
+		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
+			include custom.js

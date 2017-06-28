@@ -1,10 +1,12 @@
 //modules
 var express = require('express');
+var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
-var pg = require('pg');//can be deleted?
+var pg = require('pg');
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
+
 
 var app = express();
 
@@ -12,12 +14,12 @@ var app = express();
 
 //Sequelize connect
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, null, {
-	host: 'localhost',
-	dialect: 'postgres',
-	define: {
-		timestamps: false
-	}
+var sequelize = new Sequelize('blogapp', process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
+  host: 'localhost',
+  dialect: 'postgres',
+  define: {
+    timestamps: false
+  }
 });
 
 
@@ -30,7 +32,7 @@ app.set('view engine', 'pug');
 
 //De welbefaamde body-parser, welkom!
 app.use(bodyParser.urlencoded({
-	extended: true
+  extended: true
 }));
 
 
@@ -42,22 +44,22 @@ app.use(express.static(__dirname + '../public'));
 
 // Sequelize Models Defining
 var User = sequelize.define('user', {
-	name: Sequelize.STRING,
-	email: Sequelize.STRING,
-	password: Sequelize.STRING
+  name: Sequelize.STRING,
+  email: Sequelize.STRING,
+  password: Sequelize.STRING // replace with hash?
 });
 
 
 
 var Post = sequelize.define('post', {
-	title: Sequelize.STRING,
-	body: Sequelize.STRING,
-	timeStamp: Sequelize.DATE,
+  title: Sequelize.STRING,
+  body: Sequelize.STRING,
+  timeStamp: Sequelize.DATE,
 });
 
 var Comment = sequelize.define('comment', {
-	body: Sequelize.STRING,
-	timeStamp: Sequelize.DATE,
+  body: Sequelize.STRING,
+  timeStamp: Sequelize.DATE,
 });
 
 
@@ -102,36 +104,39 @@ app.get('/register', function(request, response){
 
 //Store login data in database
 app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
-	User.sync()
-		.then(function(){
-			User.findOne({
-				where: {
-					email: request.body.email
-				}
-			})
-			.then(function(user){
-			if(user !== null && request.body.email=== user.email) {
-        		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
-				return;
-			}
-			else {
-				User.sync()
-					.then(function(){
-						return User.create({
-							name: request.body.name,
-							email: request.body.email,
-							password: request.body.password
-						})
-					})
-					.then(function(){
-						response.render('login')
-					})
-					.then().catch(error => console.log(error))
-			}
-		})
-		.then().catch(error => console.log(error))
-		})
-	.then().catch(error => console.log(error))
+  User.sync()
+    .then(function(){
+      User.findOne({
+        where: {
+          email: request.body.email
+        }
+      })
+      .then(function(user){
+      if(user !== null && request.body.email=== user.email) {
+            response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
+        return;
+      }
+
+//hieronder bcrypt.hash(req.body.password, null, null, (err, hash)=>{
+
+      else {
+        User.sync()
+          .then(function(){
+            return User.create({
+              name: request.body.name,
+              email: request.body.email,
+              password: request.body.password //replace with hash?
+            })
+          })
+          .then(function(){
+            response.render('login')
+          })
+          .then().catch(error => console.log(error))
+      }
+    })
+    .then().catch(error => console.log(error))
+    })
+  .then().catch(error => console.log(error))
 })
 
 
@@ -159,28 +164,28 @@ app.get('/login', function (request, response) {
 
 
 app.post('/login', (request, response)=>{
-	if(request.body.email.length ===0) {
-		response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
-		return;
-	}
-	if(request.body.password.length===0) {
-		response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
-		return;
-	}
-	User.findOne({
-		where: {
-			email:request.body.email
-		}
-	}).then((user) => {
-		if(user !== null && request.body.password === user.password) {
-			request.session.user = user;
-			response.redirect('/');
-		} else {
-			response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-		}
-	}, (error)=> {
-		response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
-	});
+  if(request.body.email.length ===0) {
+    response.redirect('/?message=' + encodeURIComponent("Please fill out your email address."));
+    return;
+  }
+  if(request.body.password.length===0) {
+    response.redirect('/?message=' + encodeURIComponent("Please fill out your password."));
+    return;
+  }
+  User.findOne({
+    where: {
+      email:request.body.email
+    }
+  }).then((user) => {
+    if(user !== null && request.body.password === user.password) {
+      request.session.user = user;
+      response.redirect('/');
+    } else {
+      response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+    }
+  }, (error)=> {
+    response.redirect('/?message=' + encodeURIComponent("Invalid email or password."));
+  });
 });
 
 
@@ -198,54 +203,54 @@ app.get('/logout', (request, response)=> {
 
 //Create Post (store post)
 app.get('/post', (request,response) =>{
-	var user = request.session.user;
-	if (user === undefined) {
-		response.redirect('/?message=' + encodeURIComponent("Please log in first"));
-	}
-	Post.sync()
-	.then(function(){
-		User.findAll()
-		.then((users)=>{
-			Post.findAll({include: [{
-				model: Comment,
-				as: 'comments'
-			}]
-		})
-		.then((posts)=>{
-			response.render('post', {
-				posts: posts,
-				users: users
-			})
-		})
-	})
+  var user = request.session.user;
+  if (user === undefined) {
+    response.redirect('/?message=' + encodeURIComponent("Please log in first"));
+  }
+  Post.sync()
+  .then(function(){
+    User.findAll()
+    .then((users)=>{
+      Post.findAll({include: [{
+        model: Comment,
+        as: 'comments'
+      }]
+    })
+    .then((posts)=>{
+      response.render('post', {
+        posts: posts,
+        users: users
+      })
+    })
+  })
 })
 .then().catch(error=> console.log(error))
 });
 
 app.post('/post', (request,response) => {
-	if(request.body.message.length===0 || request.body.title.length===0) {
-		response.end('Please insert message');
-		return
-	}
-	else {
-		Post.sync()
-			.then()
-				User.findOne({
-					where: {
-						email: request.session.user.email
-					}
-				}).then((user)=>{
-					return Post.create({
-						title: request.body.title,
-						body: request.body.message,
-						userId: user.id
-					})
-				}).then().catch(error=> console.log(error))
-			.then(function() {
-				response.redirect('/post');
-			})
-			.then().catch(error => console.log(error));
-	}
+  if(request.body.message.length===0 || request.body.title.length===0) {
+    response.end('Please insert message');
+    return
+  }
+  else {
+    Post.sync()
+      .then()
+        User.findOne({
+          where: {
+            email: request.session.user.email
+          }
+        }).then((user)=>{
+          return Post.create({
+            title: request.body.title,
+            body: request.body.message,
+            userId: user.id
+          })
+        }).then().catch(error=> console.log(error))
+      .then(function() {
+        response.redirect('/post');
+      })
+      .then().catch(error => console.log(error));
+  }
 })
 
 
@@ -253,28 +258,28 @@ app.post('/post', (request,response) => {
 
 //View a list of their own posts
 app.get('/myposts', (request,response) =>{
-	var user = request.session.user;
-	if (user === undefined) {
+  var user = request.session.user;
+  if (user === undefined) {
         response.redirect('/?message=' + encodeURIComponent("Log in first!"));
     }
-	Post.findAll({
-		where: {
-			userId: user.id
-		},
-		include:[{
-			model: Comment,
-			as: 'comments'
-		}]
-	})
-	.then((posts)=>{
-		User.findAll().then((users)=>{
-			response.render('post', {
-				posts: posts,
-				users: users
-			})
-		})
-	})
-	.then().catch(error => console.log(error))
+  Post.findAll({
+    where: {
+      userId: user.id
+    },
+    include:[{
+      model: Comment,
+      as: 'comments'
+    }]
+  })
+  .then((posts)=>{
+    User.findAll().then((users)=>{
+      response.render('post', {
+        posts: posts,
+        users: users
+      })
+    })
+  })
+  .then().catch(error => console.log(error))
 });
 
 
@@ -317,46 +322,29 @@ app.get('/myposts', (request,response) =>{
 
 
 //Make comments
-	app.post('/comment', (request,response)=>{
-		if(request.body.comment.length===0) {
-			response.end('You forgot your comment!')
-		}
-		else {
-			Comment.sync()
-				.then()
-					User.findOne({
-						where: {
-							email: request.session.user.email
-						}
-					}).then(user => {
-						return Comment.create({
-							body: request.body.comment,
-							postId: request.body.messageId,
-							userId: user.id
-						})
-					}).then(function(){
-						response.redirect('/post')
-					}).then().catch(error => console.log(error));
-		}
-	})
+  app.post('/comment', (request,response)=>{
+    if(request.body.comment.length===0) {
+      response.end('You forgot your comment!')
+    }
+    else {
+      Comment.sync()
+        .then()
+          User.findOne({
+            where: {
+              email: request.session.user.email
+            }
+          }).then(user => {
+            return Comment.create({
+              body: request.body.comment,
+              postId: request.body.messageId,
+              userId: user.id
+            })
+          }).then(function(){
+            response.redirect('/post')
+          }).then().catch(error => console.log(error));
+    }
+  })
 
-
-
-
-  //look for specific post
-  // app.get('/post/:id', function (request, response) {
-  //   var postid = request.params.id
-  //   Post.findAll({
-  //     where: {
-  //       id:postid
-  //     },
-  //     include: [User, Comment]
-  //   }).then(function(posts) {
-  //     response.render('onepost', {
-  //       posts:posts
-  //     });
-  //   });
-  // });
 
 
 
@@ -375,6 +363,3 @@ sequelize.sync({force: true}).then(function () {
     console.log('sync failed: ');
     console.log(error);
 });
-
-// var server = app.listen(3000);
-// console.log('BA-App running on port 3000');

@@ -3,28 +3,36 @@ html
 		link(href='http://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css')
+		link(href='custom.css' rel='stylesheet')
 		title BA - My Profile
 	body
 		nav.nav-extended
-			.nav-wrapper
-				ul#nav-mobile.right
-					li
-						a(href='/') Home
-					li
-						a(href='/profile') Profile
-					li
-						a(href='/logout') Logout
-			.nav-content
-				ul.tabs.tabs-transparent
-					li
-						a(href='/post') Post Message
-					li.tab
-						a(href='/myposts') My Posts
-					li.tab
-						a(href='/posts') All Posts
-					li.tab.disabled
-						a(href='#') Search Post
-		h1 Welcome #{user.name} 
+				.nav-wrapper.light-blue.darken-3
+					a.brand-logo(href='/') Blog App
+					a.button-collapse(href='/', data-activates='mobile-demo')
+						i.material-icons menu
+					ul#nav-mobile.right.hide-on-med-and-down
+						li
+							a(href= '/logout') Logout
+				
+					ul#mobile-demo.side-nav
+						li
+							a(href='/logout') Logout
+				.nav-content.light-blue.darken-3
+					ul.tabs.tabs-transparent
+						li.tab
+							a.active(target='_self' href='/profile') Profile
+						li.tab
+							a(target='_self' href='/post') Post Message
+						li.tab
+							a(target='_self' href='/myposts') My Messages
+						
+		.container
+			.row
+				.col-xs-6.offset-xs-3
+					h1.text-xl-center Welcome #{user.name} 
+					hr
+					
 		
 		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
 		script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js')
