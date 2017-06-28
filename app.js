@@ -5,7 +5,7 @@ var pg = require('pg');//can be deleted?
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
-
+var bcrypt = require('bcrypt-nodejs');
 var app = express();
 
 
@@ -76,7 +76,7 @@ Comment.belongsTo(User);
 app.use(session({
     secret: 'oh wow very secret much security',
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: false
 }));
 
 
@@ -102,15 +102,21 @@ app.get('/register', function(request, response){
 
 //Store login data in database
 app.post('/register', bodyParser.urlencoded({extended:true}), (request,response) => {
+
+  var email = request.body.email
+  var password = request.body.password
+
 	User.sync()
 		.then(function(){
 			User.findOne({
 				where: {
-					email: request.body.email
+					email: email
 				}
 			})
 			.then(function(user){
-			if(user !== null && request.body.email=== user.email) {
+        var hash = user.password;
+        bcrypt.compare(password, hash, function(error, result){
+        if(user !== null && email=== user.email) {
         		response.redirect('/?message=' + encodeURIComponent("Email is in use!"));
 				return;
 			}
@@ -119,8 +125,8 @@ app.post('/register', bodyParser.urlencoded({extended:true}), (request,response)
 					.then(function(){
 						return User.create({
 							name: request.body.name,
-							email: request.body.email,
-							password: request.body.password
+							email: email,
+							password: password
 						})
 					})
 					.then(function(){
@@ -279,41 +285,6 @@ app.get('/myposts', (request,response) =>{
 
 
 
-//View a list of everyone's posts
-// app.get('/allposts', function (request, response) {
-//
-//   Post.findAll({
-//     include: [
-//       {model: User},
-//       {model: Comment,
-//         include: {model: User}}
-//       ]
-//     }).then(function (posts) {
-//       response.render('allposts', {
-//         allPosts: posts
-//       });
-//       // response.send(posts)
-//     });
-//   });
-//
-// Post.findAll(
-//     {
-//       where: {userId: userId},
-//       include: [User,
-//         {
-//           model: Comment,
-//           include: [
-//             User
-//           ]
-//         }
-//       ]}
-//   )
-//   .then(function(posts){
-//     res.render("allposts", {posts, userId})
-//   })
-// })
-
-
 
 
 //Make comments
@@ -343,24 +314,6 @@ app.get('/myposts', (request,response) =>{
 
 
 
-  //look for specific post
-  // app.get('/post/:id', function (request, response) {
-  //   var postid = request.params.id
-  //   Post.findAll({
-  //     where: {
-  //       id:postid
-  //     },
-  //     include: [User, Comment]
-  //   }).then(function(posts) {
-  //     response.render('onepost', {
-  //       posts:posts
-  //     });
-  //   });
-  // });
-
-
-
-
 sequelize.sync({force: true}).then(function () {
     User.create({
         name: "stabbins",
@@ -376,5 +329,4 @@ sequelize.sync({force: true}).then(function () {
     console.log(error);
 });
 
-// var server = app.listen(3000);
-// console.log('BA-App running on port 3000');
+
