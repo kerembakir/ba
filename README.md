@@ -1,6 +1,8 @@
-# blog-application
+# Blog application
 
 ![banner](http://members.chello.nl/m.van.duren/img/blog.png)
+
+
 ![banner](http://members.chello.nl/m.van.duren/img/mobile.png)
 
 
