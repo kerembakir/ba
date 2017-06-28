@@ -2,8 +2,7 @@
 var express = require('express');
 var bcrypt = require('bcrypt-nodejs');
 var bodyParser = require('body-parser');
-// var fs = require('fs');
-var pg = require('pg');//can be deleted?
+var pg = require('pg');
 var pug = require ('pug');
 var sequelize = require('sequelize');
 var session = require('express-session');
@@ -349,48 +348,6 @@ app.get('/myposts', (request,response) =>{
 
 
 
-  //look for specific post
-  // app.get('/post/:id', function (request, response) {
-  //   var postid = request.params.id
-  //   Post.findAll({
-  //     where: {
-  //       id:postid
-  //     },
-  //     include: [User, Comment]
-  //   }).then(function(posts) {
-  //     response.render('onepost', {
-  //       posts:posts
-  //     });
-  //   });
-  // });
-
-//bcrypt
-
-// var password = process.argv[2]; // get their password from the user registration form
-// bcrypt.hash(password, 8, function(err, hash) {
-//   if (err !== undefined) {
-//     console.log(err);
-//   } else {
-//     sequelize.writeFile("file.txt", hash); // store it in the database
-//   }
-// });
-
-
-// var password = process.argv[2]; // get their password from the user login form
-// fs.readFile('file.txt', function(err, data) { // equivalent to getting the user from the database
-//   bcrypt.compare(password, data.toString(), function(err, result) {
-//     if (err !== undefined) {
-//       console.log(err);
-//     } else {
-//       console.log(result);
-//     }
-//   });
-// });
-
-
-
-
-
 
 sequelize.sync({force: true}).then(function () {
     User.create({
@@ -406,6 +363,3 @@ sequelize.sync({force: true}).then(function () {
     console.log('sync failed: ');
     console.log(error);
 });
-
-// var server = app.listen(3000);
-// console.log('BA-App running on port 3000');
